@@ -1,0 +1,58 @@
+/*
+ CS2124
+ hw01.cpp
+ 
+ Caesar Cypher - decrypt an encrypted file using rotation
+ */
+
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+// Takes encrypted char and rotation distance, returns the corresponding decrypted character
+char decrypt_char(char chr, int step){
+    if (chr >= 'A' && chr <= 'Z'){
+        // exclude punctuation and assume encrypted.txt does not contain lower case
+        if (chr < ('A' + step) && chr >= 'A'){
+            // goes around the alphabet if step exceeds 'A'
+            chr += 26;
+        }
+        chr -= step;
+    }
+    return chr;
+}
+
+// Takes string and rotation distance, decrypts the string
+void decrypt_string(string& input_str, int step) {
+    for (char& chr : input_str) {
+        chr = decrypt_char(chr, step);
+    }
+}
+
+int main(){
+    ifstream encryptfile("encrypted.txt");
+    if (!encryptfile){
+        cerr << "Error when opening encrypted.txt" << endl;
+        exit(1);
+    }
+    
+    string line;
+    vector<string> lines;
+    int step;
+    encryptfile >> step;
+    
+    while (getline(encryptfile, line)) {
+        lines.push_back(line);
+    }
+    
+    encryptfile.close();
+    
+    for (size_t i = 0; i < lines.size(); i++) {
+        // goes through strings in reverse order
+        string curr_line = lines[lines.size() - i - 1];
+        decrypt_string(curr_line, step);
+        cout << curr_line << endl;
+    }
+}
