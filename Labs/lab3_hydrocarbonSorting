@@ -1,0 +1,132 @@
+/*
+ CS2124
+ rec03.cpp
+ 
+ Hydrocarbon Sorting
+*/
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct Hydrocarbon{
+    vector<string> HCname;
+    int numOfCarbon;
+    int numOfHydrogen;
+};
+
+// function prototypes
+void openFile(ifstream& file);
+void fillVector(ifstream& file, vector<Hydrocarbon>& hydrocarbons);
+void insertInformation(vector<Hydrocarbon>& hydrocarbons, const string& name, int numOfCs, int numOfHs);
+size_t findLocation(int numOfC, int numOfH, const vector<Hydrocarbon>& hydrocarbons);
+void sortingHCs(vector<Hydrocarbon>& hydrocarbons);
+void displayVectors(const vector<Hydrocarbon>& hydrocarbons);
+void printFormula(const Hydrocarbon& element);
+
+int main(){
+    ifstream file;
+    openFile(file);
+    
+    vector<Hydrocarbon> hydrocarbons;
+    fillVector(file, hydrocarbons);
+    file.close();
+    
+    sortingHCs(hydrocarbons);
+    displayVectors(hydrocarbons);
+    
+}
+
+
+void openFile(ifstream& file){
+    do {
+        file.clear();
+        string file_name;
+        cout << "What is the file name: " << endl;
+        cin >> file_name;
+        file.open(file_name);
+        
+        if (!file){
+            cerr << "Unable to open: " << file_name << endl;
+        }
+        
+    } while(!file);
+    
+}
+
+void fillVector(ifstream& file, vector<Hydrocarbon>& hydrocarbons){
+    string name;
+    char cOrH;
+    int numOfC;
+    int numOfH;
+    
+    while (file >> name >> cOrH >> numOfC >> cOrH >> numOfH){
+        insertInformation(hydrocarbons, name, numOfC, numOfH);
+    }
+}
+
+// pushes names and compounds into vector
+void insertInformation(vector<Hydrocarbon>& hydrocarbons, const string& name, int numOfCs, int numOfHs) {
+    size_t location;
+    location = findLocation(numOfCs, numOfHs, hydrocarbons);
+    Hydrocarbon newHC;
+    
+    if (location == hydrocarbons.size()) {
+        newHC.HCname.push_back(name);
+        newHC.numOfCarbon = numOfCs;
+        newHC.numOfHydrogen = numOfHs;
+        hydrocarbons.push_back(newHC);
+    }
+    else {
+        hydrocarbons[location].HCname.push_back(name);
+    }
+}
+
+// determines if there are duplicates and returns index
+// else, returns size of vector if no duplicates
+size_t findLocation(int numOfC, int numOfH, const vector<Hydrocarbon>& hydrocarbons) {
+    for (size_t element = 0; element < hydrocarbons.size(); ++element){
+        if (hydrocarbons[element].numOfCarbon == numOfC && hydrocarbons[element].numOfHydrogen == numOfH){
+            return element;
+        }
+    }
+    return hydrocarbons.size();
+}
+
+// sorting the formulas using bubble sort
+void sortingHCs(vector<Hydrocarbon>& hydrocarbons) {
+    for (size_t i = 0; i < hydrocarbons.size(); i++) {
+        for (size_t j = 0; j < hydrocarbons.size() - 1; j++) {
+            if (hydrocarbons[j].numOfCarbon > hydrocarbons[j + 1].numOfCarbon){
+                Hydrocarbon temp;
+                temp = hydrocarbons[j];
+                hydrocarbons[j] = hydrocarbons[j+1];
+                hydrocarbons[j+1] = temp;
+            }
+            else if (hydrocarbons[j].numOfCarbon == hydrocarbons[j+1].numOfCarbon && hydrocarbons[j].numOfHydrogen > hydrocarbons[j+1].numOfHydrogen){
+                Hydrocarbon temp2;
+                temp2 = hydrocarbons[j];
+                hydrocarbons[j] = hydrocarbons[j+1];
+                hydrocarbons[j+1] = temp2;
+                
+            }
+        }
+    }
+}
+
+void displayVectors(const vector<Hydrocarbon>& hydrocarbons) {
+    for (const Hydrocarbon& element : hydrocarbons){
+        printFormula(element);
+        // it's already printing and it returns void so you're effectively cout << void << endl;
+    }
+}
+
+void printFormula(const Hydrocarbon& element) {
+    string namesToPrint;
+    for (const string& name : element.HCname){
+        namesToPrint = namesToPrint + name + ' ';
+    }
+    cout << 'C' << element.numOfCarbon << 'H' << element.numOfHydrogen << ' ' << namesToPrint << endl;
+}
