@@ -1,0 +1,125 @@
+/*
+ CS2124
+ rec02.cpp
+ 
+ Implementation of Conway's Game of Life
+*/
+
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+int main(){
+    ifstream file("life.txt");
+    // check if file can be successfully opened
+    if (!file) {
+            cerr << "Could not open the file.\n";
+            exit(1);
+    }
+
+    // printing intial state of world
+    cout << "Initial world\n";
+    vector<string> world;
+    string line;
+    while (getline(file, line)){
+        world.push_back(line);
+    }
+    for (size_t i = 0; i < world.size(); ++i) {
+        cout << world[i] << endl;
+    }
+    file.close();
+    cout << "====================\n";
+    
+    // setting newWorld so the original world doesn't get changed
+    vector<string> newWorld = world;
+    
+    for (int counter = 0; counter < 10; ++counter) {
+        
+        // i is row, j is column
+        for (int i = 0; i < world.size(); ++i) {
+            for (int j = 0; j < world[i].size(); ++j) {
+                if (world[i][j] == '*') {
+                    int count = 0;
+                    if (i >= 1 && j >= 1 && world[i - 1][j - 1] == '*') { // top left
+                        count++;
+                    }
+                    if (i >= 1 && world[i - 1][j] == '*') { // top middle
+                        count++;
+                    }
+                    if (i >= 1 && j < world[i].size() - 1 && world[i - 1][j + 1] == '*') { // top right
+                        count++;
+                    }
+                    if (j >= 1 && world[i][j - 1] == '*') { // left
+                        count++;
+                    }
+                    if (j < world[i].size() - 1 && world[i][j + 1] == '*') { // right
+                        count++;
+                    }
+                    if (i < world.size() - 1 && j >= 1 && world[i + 1][j - 1] == '*') { // down left
+                        count++;
+                    }
+                    if (i < world.size() - 1 && world[i + 1][j] == '*') { // down middle
+                        count++;
+                    }
+                    if (i < world.size() - 1 && j < world[i].size() - 1 && world[i + 1][j + 1] == '*') { // down right
+                        count++;
+                    }
+                    
+                    // loneliness or overpopulation
+                    if (count < 2 || count > 3) {
+                        newWorld[i][j] = '-';
+                    }
+
+                }
+                else if (world[i][j] == '-') {
+                    int count = 0;
+                    if (i >= 1 && j >= 1 && world[i - 1][j - 1] == '*') { // top left
+                        count++;
+                    }
+                    if (i >= 1 && world[i - 1][j] == '*') { // top middle
+                        count++;
+                    }
+                    if (i >= 1 && j < world[i].size() - 1 && world[i - 1][j + 1] == '*') { // top right
+                        count++;
+                    }
+                    if (j >= 1 && world[i][j - 1] == '*') { // left
+                        count++;
+                    }
+                    if (j < world[i].size() - 1 && world[i][j + 1] == '*') { // right
+                        count++;
+                    }
+                    if (i < world.size() - 1 && j >= 1 && world[i + 1][j - 1] == '*') { // down left
+                        count++;
+                    }
+                    if (i < world.size() - 1 && world[i + 1][j] == '*') { // down middle
+                        count++;
+                    }
+                    if (i < world.size() - 1 && j < world[i].size() - 1 && world[i + 1][j + 1] == '*') { // down right
+                        count++;
+                    }
+                    
+                    // exactly 3 neighbours, comes to life next generation
+                    if (count == 3) {
+                        newWorld[i][j] = '*';
+                    }
+                }
+            }
+        }
+
+        cout << "Generation: " << counter + 1 << "\n";
+        
+        for (int i = 0; i < newWorld.size(); ++i) {
+            for (int j = 0; j < newWorld[i].size(); ++j) {
+                
+                cout << newWorld[i][j];
+            }
+            cout << "\n";
+        
+        // setting old world as what was printed, so can continue to next generation
+        world = newWorld;
+        }
+    cout << "====================\n";
+    }
+}
